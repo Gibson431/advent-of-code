@@ -50,7 +50,7 @@ pub fn process(input: &str) -> String {
 }
 
 fn process_line(input: &str, num_colors: &NumColors) -> bool {
-    let mut isViable = true;
+    let mut is_viable = true;
     let mut formatted = input.split(":");
     let formatted = formatted.nth(1);
     formatted
@@ -59,10 +59,10 @@ fn process_line(input: &str, num_colors: &NumColors) -> bool {
         .map(|val| NumColors::parse(val))
         .for_each(|r| {
             if r.red > num_colors.red || r.green > num_colors.green || r.blue > num_colors.blue {
-                isViable = false;
+                is_viable = false;
             }
         });
-    isViable
+    is_viable
 }
 
 #[cfg(test)]
