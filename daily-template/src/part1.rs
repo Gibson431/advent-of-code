@@ -1,8 +1,4 @@
-pub fn process(_input: &str) -> &str {
-    todo!("part 1");
-}
-
-fn process_line(_input: &str) -> &str {
+pub fn process(_input: &str) -> String {
     todo!("part 1");
 }
 
@@ -13,14 +9,8 @@ mod tests {
 
     #[rstest]
     #[case("", "")]
-    fn test_process_line(#[case] input: &str, #[case] expected: &str) {
-        assert_eq!(expected, process_line(input));
-    }
-
-    #[test]
-    fn test_process() {
-        let input = "";
-        assert_eq!("", process(input));
+    fn test_process(#[case] input: &str, #[case] expected: &str) {
+        assert_eq!(expected, process(input));
         todo!("haven't built test yet");
     }
 }
