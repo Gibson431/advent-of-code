@@ -10,7 +10,7 @@ mod tests {
     #[rstest]
     #[case("", "")]
     fn test_process(#[case] input: &str, #[case] expected: &str) {
-        assert_eq!(expected, process(input));
+        assert_eq!(expected.to_string(), process(input));
         todo!("haven't built test yet");
     }
 }
