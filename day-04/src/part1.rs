@@ -1,49 +1,8 @@
-#[derive(Clone, Debug, Default, PartialEq, PartialOrd)]
-struct ScratchCard {
-    winning_numbers: Vec<u32>,
-    own_numbers: Vec<u32>,
-}
-
-impl ScratchCard {
-    fn new() -> ScratchCard {
-        ScratchCard {
-            winning_numbers: vec![],
-            own_numbers: vec![],
-        }
-    }
-
-    fn parse(input: &str) -> ScratchCard {
-        let mut new_card = ScratchCard::new();
-        let vecs = input
-            .split(":")
-            .nth(1)
-            .expect("wrong format")
-            .split("|")
-            .map(|s| {
-                s.trim()
-                    .replace("  ", " ")
-                    .split(" ")
-                    .map(|val| val.parse().unwrap_or(0))
-                    .collect::<Vec<u32>>()
-            })
-            .collect::<Vec<Vec<u32>>>();
-
-        new_card.winning_numbers = vecs.first().expect("vec should exist").to_owned();
-        new_card.own_numbers = vecs.last().expect("vec should exist").to_owned();
-
-        new_card
-    }
-}
+use crate::scratch_card::*;
 
 fn process_card(input: &str) -> String {
     let new_card = ScratchCard::parse(input);
-    let mut winners = vec![];
-    new_card.own_numbers.iter().for_each(|s| {
-        if new_card.winning_numbers.contains(s) {
-            winners.push(s)
-        }
-    });
-    let points: u32 = (2 as u32).pow(winners.len() as u32) / 2;
+    let points = new_card.calculate_points();
     points.to_string()
 }
 
