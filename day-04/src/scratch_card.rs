@@ -34,14 +34,18 @@ impl ScratchCard {
         new_card
     }
 
-    pub fn calculate_points(&self) -> u32 {
+    pub fn calculate_matches(&self) -> Vec<u32> {
         let mut winners = vec![];
         self.own_numbers.iter().for_each(|s| {
             if self.winning_numbers.contains(s) {
-                winners.push(s)
+                winners.push(s.clone())
             }
         });
-        
+        winners
+    }
+
+    pub fn calculate_points(&self) -> u32 {
+        let winners = self.calculate_matches();
         let points: u32 = (2 as u32).pow(winners.len() as u32) / 2;
 
         points
