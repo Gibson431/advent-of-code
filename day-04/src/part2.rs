@@ -2,18 +2,29 @@ use crate::scratch_card::*;
 
 pub fn process(input: &str) -> String {
     let cards: Vec<ScratchCard> = input.lines().map(|l| ScratchCard::parse(l)).collect();
-    let mut num_cards = vec![1; cards.len()];
+    let mut num_cards:Vec<u32> = vec![1; cards.len()];
     let num_lines = num_cards.len();
 
+    // cards.clone().iter().enumerate().for_each(|(index, card)| {
+    //     for _ in 0..num_cards[index] {
+    //         let matches = card.calculate_matches().len();
+    //         for p in 0..matches {
+    //             if index + 1 + p as usize >= num_lines {
+    //                 num_cards[num_lines - 1] += 1;
+    //             } else {
+    //                 num_cards[index + 1 + p as usize] += 1;
+    //             }
+    //         }
+    //     }
+    // });
+    
     cards.clone().iter().enumerate().for_each(|(index, card)| {
-        for _ in 0..num_cards[index] {
-            let matches = card.calculate_matches().len();
-            for p in 0..matches {
-                if index + 1 + p as usize >= num_lines {
-                    num_cards[num_lines - 1] += 1;
-                } else {
-                    num_cards[index + 1 + p as usize] += 1;
-                }
+        let matches = card.calculate_matches().len();
+        for p in 0..matches {
+            if index + 1 + p as usize >= num_lines {
+                num_cards[num_lines - 1] += num_cards[index];
+            } else {
+                num_cards[index + 1 + p as usize] += num_cards[index];
             }
         }
     });
