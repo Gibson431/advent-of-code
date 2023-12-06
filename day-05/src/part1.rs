@@ -1,9 +1,9 @@
-use std::{collections::HashMap, string::ParseError};
+use std::ops::Range;
 
 use nom::{
     bytes::complete::tag,
     character::complete::{self, alpha1, space0, space1},
-    error::{Error, ErrorKind},
+    error::Error,
     multi::{fold_many1, separated_list1},
     sequence::{preceded, separated_pair, terminated},
     IResult,
@@ -44,7 +44,7 @@ impl Path {
 struct SeedMap {
     from: Path,
     to: Path,
-    pairs: HashMap<u32, u32>,
+    pairs: Vec<(Range<u64>, Range<u64>)>,
 }
 
 impl SeedMap {
@@ -52,7 +52,7 @@ impl SeedMap {
         SeedMap {
             from,
             to,
-            pairs: HashMap::new(),
+            pairs: Vec::new(),
         }
     }
 
@@ -69,28 +69,28 @@ impl SeedMap {
 
         let mut seed_map = SeedMap::new(from_path, to_path);
         section.for_each(|line| {
-            let (_, split): (&str, Vec<u32>) =
-                separated_list1(space1::<&str, Error<&str>>, complete::u32)(*line).unwrap();
+            let (_, split): (&str, Vec<u64>) =
+                separated_list1(space1::<&str, Error<&str>>, complete::u64)(*line).unwrap();
             let mut split = split.iter();
             let dest = *split.next().unwrap();
             let source = *split.next().unwrap();
             let range = *split.last().unwrap();
-            for i in 0..range {
-                seed_map.pairs.insert(source + i, dest + i);
-            }
+            seed_map
+                .pairs
+                .push((source..source + range, dest..dest + range));
         });
 
         seed_map
     }
 }
 
-fn input_seeds(input: &str) -> IResult<&str, Vec<u32>> {
+fn input_seeds(input: &str) -> IResult<&str, Vec<u64>> {
     preceded(
         tag("seeds: "),
         fold_many1(
-            terminated(complete::u32, space0),
+            terminated(complete::u64, space0),
             Vec::new,
-            |mut acc: Vec<u32>, item| {
+            |mut acc: Vec<u64>, item| {
                 acc.push(item);
                 acc
             },
@@ -111,13 +111,23 @@ pub fn process(input: &str) -> String {
     let seed_maps = seed_maps.iter();
     let mut locations = vec![];
     starting_points.iter().for_each(|point| {
-        let mut num = point;
+        let mut num = *point;
         let mut current_map = seed_maps
             .clone()
             .find(|val| val.from == Path::Seed)
             .unwrap();
         while current_map.from != Path::Location {
-            num = current_map.pairs.get(num).unwrap_or(num);
+            let mut temp_num = num;
+            current_map
+                .pairs
+                .clone()
+                .into_iter()
+                .for_each(|(from, to)| {
+                    if from.contains(&num) {
+                        temp_num = (num - from.start) + to.start;
+                    }
+                });
+            num = temp_num.clone();
             current_map = seed_maps
                 .clone()
                 .find(|map| map.from == current_map.to)
@@ -126,11 +136,7 @@ pub fn process(input: &str) -> String {
         locations.push(num)
     });
 
-    dbg!(locations.clone());
-
     locations.iter().min().unwrap_or(&&0).to_string()
-
-    // todo!("part 1");
 }
 
 #[cfg(test)]
