@@ -1,16 +1,9 @@
 use std::iter::zip;
 
-use itertools::Itertools;
 use nom::{
-    bytes::complete::{tag, take_till, take_until, take_while1},
-    character::{
-        complete::{self, multispace0, multispace1, newline, space0, space1},
-        is_digit, is_space,
-        streaming::alpha1,
-    },
-    error::ParseError,
-    multi::{fold_many0, fold_many1, separated_list0, separated_list1},
-    sequence::{preceded, terminated, tuple},
+    bytes::complete::tag,
+    character::complete::{self, space1},
+    multi::separated_list1,
     IResult, Parser,
 };
 
@@ -30,7 +23,7 @@ impl Race {
 
 fn parse_input(input: &str) -> IResult<&str, Vec<Race>> {
     let mut lines = input.lines();
-    let (input, times) = tag("Time:")
+    let (_, times) = tag("Time:")
         .precedes(space1)
         .precedes(separated_list1(space1, complete::u32))
         .parse(lines.next().unwrap())?;
@@ -47,10 +40,15 @@ fn parse_input(input: &str) -> IResult<&str, Vec<Race>> {
 }
 
 pub fn process(input: &str) -> String {
-    let races = parse_input(input);
-
+    let (_, races) = parse_input(input).unwrap();
     dbg!(&races);
-    todo!("part 1")
+
+    let counts = races.iter().map(|r| {
+        (0..r.time)
+            .filter_map(|t| (t * (r.time - t) > r.record).then_some(t))
+            .count()
+    });
+    counts.product::<usize>().to_string()
 }
 
 #[cfg(test)]
