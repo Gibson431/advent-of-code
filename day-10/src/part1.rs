@@ -46,9 +46,9 @@ pub fn process(input: &str) -> String {
     let mut pipe_length = 0;
     while map.get(current_loc) != Some(&Pipe::Start) {
         pipe_length += 1;
-        todo!("process")
+        todo!("process");
     }
-    todo!("part 1")
+    (pipe_length / 2 + 1).to_string()
 }
 
 #[cfg(test)]
