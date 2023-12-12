@@ -1,3 +1,5 @@
+
+use itertools::Itertools;
 use nom::{
     bytes::complete::tag,
     character::complete::{self, space1},
@@ -16,15 +18,26 @@ fn parse_input(input: &str) -> IResult<&str, Vec<Vec<i32>>> {
 }
 
 fn process_history(input: &Vec<i32>) -> i32 {
-    todo!()
+    let mut lines = vec![input.clone()];
+    let mut current_line = input.iter().tuple_windows();
+    while current_line.len() > 0 {
+        lines.push(current_line.map(|(a, b)| b - a).collect());
+        current_line = lines.last().expect("should exist").iter().tuple_windows();
+    }
+
+    lines
+        .iter()
+        .rev()
+        .fold(0, |acc, l| l.last().expect("should exist") + acc)
 }
 
 pub fn process(input: &str) -> String {
     let (_, histories) = parse_input(input).expect("should succeed");
 
-    histories.iter().fold(0, |acc, history| {
-        acc + process_history(history)
-    }).to_string()
+    histories
+        .iter()
+        .fold(0, |acc, history| acc + process_history(history))
+        .to_string()
 }
 
 #[cfg(test)]
