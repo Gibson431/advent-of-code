@@ -1,6 +1,6 @@
 #[tracing::instrument]
 pub fn process(_input: &str) -> miette::Result<String> {
-    Ok("{{project-name}} - part 1".to_string());
+    Ok("{{project-name}} - part 1".to_string())
 }
 
 #[cfg(test)]
