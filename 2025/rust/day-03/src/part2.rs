@@ -1,6 +1,7 @@
 use itertools::Itertools;
+use tracing::info;
 
-#[tracing::instrument]
+// #[tracing::instrument(skip(input))]
 pub fn process(input: &str) -> miette::Result<String> {
     let banks = input.lines();
 
@@ -10,6 +11,7 @@ pub fn process(input: &str) -> miette::Result<String> {
     Ok(jolts.to_string())
 }
 
+#[tracing::instrument]
 fn process_bank(bank: &str) -> u64 {
     let bank_as_num: Vec<_> = bank
         .chars()
@@ -19,12 +21,12 @@ fn process_bank(bank: &str) -> u64 {
     let mut last_idx = 0;
     let mut acc = 0;
     for i in (0..12).rev() {
-        let (idx, jolt) = max_in_iter(
-            bank_as_num[last_idx..bank_as_num.len() - i]
-                .iter(),
-        );
-        last_idx = idx;
-        acc += jolt * i as u64;
+        let sub_bank =
+            &bank_as_num[last_idx..bank_as_num.len() - i];
+        let (idx, jolt) = max_in_iter(sub_bank.iter());
+        acc += jolt * (10_u64.pow(i as _));
+        info!(?sub_bank, last_idx, idx, jolt, acc);
+        last_idx += idx + 1;
     }
 
     acc
@@ -33,9 +35,8 @@ fn process_bank(bank: &str) -> u64 {
 fn max_in_iter<'a>(
     mut iter: impl Iterator<Item = &'a u64> + Clone,
 ) -> (usize, u64) {
-    let num = iter.clone().max().unwrap();
+    let num = iter.clone().sorted().rev().next().unwrap();
     let idx = iter.position(|x| x == num).unwrap();
-
     (idx, num.clone())
 }
 
@@ -43,7 +44,7 @@ fn max_in_iter<'a>(
 mod tests {
     use super::*;
 
-    #[test]
+    #[test_log::test]
     fn test_process() -> miette::Result<()> {
         let input = "987654321111111
 811111111111119
@@ -56,6 +57,8 @@ mod tests {
     #[rstest::rstest]
     #[case("987654321111111", 987654321111)]
     #[case("811111111111119", 811111111119)]
+    #[case("234234234234278", 434234234278)]
+    #[case("818181911112111", 888911112111)]
     fn process_bank_test(
         #[case] input: &str,
         #[case] expected: u64,
