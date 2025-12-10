@@ -2,6 +2,7 @@
 members = [
     "day-01",
     "day-02",
+    "day-03",
 ]
 default-members = ["day-*"]
 resolver = "3"
@@ -10,6 +11,7 @@ resolver = "3"
 divan = "0.1.7"
 glam = "0.30"
 itertools = "0.14.0"
+nalgebra = "0.34.1"
 ndarray = "0.17.1"
 nom = "8.0.0"
 nom_locate = "5.0"
