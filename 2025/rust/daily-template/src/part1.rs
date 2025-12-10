@@ -1,4 +1,4 @@
-#[tracing::instrument]
+#[tracing::instrument(skip(input))]
 pub fn process(_input: &str) -> miette::Result<String> {
     Ok("{{project-name}} - part 1".to_string())
 }
@@ -7,7 +7,7 @@ pub fn process(_input: &str) -> miette::Result<String> {
 mod tests {
     use super::*;
 
-    #[test]
+    #[test_log::test]
     fn test_process() -> miette::Result<()> {
         todo!("haven't built test yet");
         let input = "";
