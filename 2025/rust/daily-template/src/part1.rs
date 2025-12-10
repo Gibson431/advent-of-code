@@ -1,5 +1,6 @@
 #[tracing::instrument(skip(input))]
-pub fn process(_input: &str) -> miette::Result<String> {
+pub fn process(input: &str) -> miette::Result<String> {
+    let _ = input;
     Ok("{{project-name}} - part 1".to_string())
 }
 
