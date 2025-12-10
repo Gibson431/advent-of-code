@@ -12,9 +12,33 @@ pub fn process(input: &str) -> miette::Result<String> {
         miette::miette!("failed to parse input, {e}")
     })?;
 
-    dbg!(content);
+    let mut count = 0;
+    for sl in content.iter() {
+        count += sl.clone().fold(0, |acc, num| {
+            let num_str = num.to_string();
+            let half = num_str.len() / 2;
 
-    Ok("day-02 - part 1".to_string())
+            if &num_str[..half] == &num_str[half..] {
+                acc + num
+            } else {
+                acc
+            }
+            // if (0..num_str.len() / 2).any(|i| {
+            //     let mut zipped = (&num_str[0..i + 1])
+            //         .bytes()
+            //         .cycle()
+            //         .zip(num_str.bytes());
+            //     zipped.all(|(a, b)| a == b)
+            // }) {
+            //     dbg!(num);
+            //     acc
+            // } else {
+            //     acc + num
+            // }
+        });
+    }
+
+    Ok(count.to_string())
 }
 
 fn parse(
